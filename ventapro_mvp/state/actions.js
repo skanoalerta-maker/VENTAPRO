@@ -237,7 +237,7 @@
     const project = touchProject(Object.assign({}, state.project, {
       customer: Object.assign({}, state.project.customer, values || {}),
     }));
-    return persist(withHistory(project, "panel editado", `Panel ${panelId} actualizado.`));
+    return persist(withHistory(project, "cliente actualizado", "Datos del cliente del proyecto actualizados."));
   }
 
   function updateProjectNotes(notes) {
@@ -246,7 +246,7 @@
     const project = touchProject(Object.assign({}, state.project, {
       notes: notes || "",
     }));
-    return persist(withHistory(project, "division agregada", `Division ${orientation} agregada.`));
+    return persist(withHistory(project, "notas actualizadas", "Notas del proyecto actualizadas."));
   }
 
   function updatePanel(panelId, values) {
@@ -358,7 +358,7 @@
       selectedDivisionId: id,
       selectedDivisionOrientation: orientation,
     }));
-    return persist(withHistory(project, "division eliminada", `${resolvedOrientation} ${id}.`));
+    return persist(withHistory(project, "division bloqueada", `${orientation} ${id}.`));
   }
 
   function removeDivision(idOrOrientation, orientation) {
