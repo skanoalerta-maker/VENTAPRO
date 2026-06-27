@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "663221835822",
+    "project_id": "skano-app-e734d",
+    "storage_bucket": "skano-app-e734d.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:663221835822:android:4892e58fac4ccfadb1e7bf",
+        "android_client_info": {
+          "package_name": "cl.skano.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC0_sOvjzDw7NR8VAzUlubC612wRPYXo14"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:663221835822:android:08c63e2569ccc126b1e7bf",
+        "android_client_info": {
+          "package_name": "com.example.skano_nuevo"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC0_sOvjzDw7NR8VAzUlubC612wRPYXo14"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

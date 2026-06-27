@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VENTAPRO MVP</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark">VP</div>
+        <div>
+          <strong>VENTAPRO</strong>
+          <span>Diseño, cotización y ERP</span>
+        </div>
+      </div>
+
+      <nav class="nav" aria-label="Módulos VENTAPRO">
+        <button class="nav-item active" data-view="dashboard">Dashboard</button>
+        <button class="nav-item" data-view="catalog">Catálogo</button>
+        <button class="nav-item" data-view="customers">Clientes</button>
+        <button class="nav-item" data-view="measurements">Medidas</button>
+        <button class="nav-item" data-view="cad">Editor CAD</button>
+        <button class="nav-item" data-view="quote">Cotización</button>
+        <button class="nav-item" data-view="erp">ERP</button>
+        <button class="nav-item" data-view="ai">IA / 3D</button>
+      </nav>
+
+      <div class="sidebar-card">
+        <span>Proyecto activo</span>
+        <strong id="sidebarProject">Casa Lo Barnechea</strong>
+        <small>Guardado automático habilitado</small>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">MVP funcional inicial</p>
+          <h1 id="viewTitle">Dashboard Principal</h1>
+        </div>
+        <div class="top-actions">
+          <button class="icon-btn" id="themeToggle" title="Cambiar modo">◐</button>
+          <button class="primary-action" data-view-shortcut="cad">Nuevo diseño</button>
+        </div>
+      </header>
+
+      <section class="view active" id="dashboard">
+        <div class="kpi-grid">
+          <article class="kpi-card">
+            <span>Proyectos activos</span>
+            <strong>18</strong>
+            <small>4 en cotización</small>
+          </article>
+          <article class="kpi-card">
+            <span>Cotizaciones pendientes</span>
+            <strong>$24,8M</strong>
+            <small>CLP estimado</small>
+          </article>
+          <article class="kpi-card">
+            <span>Producción</span>
+            <strong>7 órdenes</strong>
+            <small>2 críticas esta semana</small>
+          </article>
+          <article class="kpi-card">
+            <span>Desperdicio promedio</span>
+            <strong id="wasteKpi">8%</strong>
+            <small>Motor de cálculo</small>
+          </article>
+        </div>
+
+        <div class="content-grid">
+          <article class="panel wide">
+            <div class="panel-head">
+              <div>
+                <h2>Flujo del proyecto</h2>
+                <p>Desde diseño paramétrico hasta fabricación e instalación.</p>
+              </div>
+            </div>
+            <div class="workflow">
+              <span class="done">Bienvenida</span>
+              <span class="done">Perfil</span>
+              <span class="done">Proyecto</span>
+              <span class="active-step">Diseño CAD</span>
+              <span>Cálculo</span>
+              <span>Cotización</span>
+              <span>Producción</span>
+              <span>Instalación</span>
+              <span>Postventa</span>
+            </div>
+          </article>
+
+          <article class="panel">
+            <h2>Últimos proyectos</h2>
+            <div class="list" id="projectList"></div>
+          </article>
+
+          <article class="panel">
+            <h2>Alertas técnicas</h2>
+            <div class="alert-list" id="alertList"></div>
+          </article>
+        </div>
+      </section>
+
+      <section class="view" id="catalog">
+        <div class="section-head">
+          <div>
+            <h2>Catálogo técnico</h2>
+            <p>Modelos base para ventanas, puertas, mamparas, fachadas y diseño libre.</p>
+          </div>
+          <input class="search" id="catalogSearch" placeholder="Buscar modelo, apertura o sistema" />
+        </div>
+        <div class="catalog-grid" id="catalogGrid"></div>
+      </section>
+
+      <section class="view" id="customers">
+        <div class="content-grid">
+          <article class="panel wide">
+            <div class="panel-head">
+              <div>
+                <h2>Clientes</h2>
+                <p>Base comercial local para proyectos, cotizaciones e historial.</p>
+              </div>
+              <input class="search" id="customerSearch" placeholder="Buscar cliente, RUT, teléfono o correo" />
+            </div>
+            <div id="customerList" class="customer-list"></div>
+          </article>
+          <article class="panel">
+            <h2>Ficha cliente</h2>
+            <form class="form-grid customer-form" id="customerForm">
+              <input type="hidden" id="customerIdInput" />
+              <label>Tipo
+                <select id="customerTypeInput">
+                  <option value="particular">Particular</option>
+                  <option value="empresa">Empresa</option>
+                </select>
+              </label>
+              <label>Estado
+                <select id="customerStatusInput">
+                  <option value="prospecto">Prospecto</option>
+                  <option value="activo">Activo</option>
+                  <option value="inactivo">Inactivo</option>
+                </select>
+              </label>
+              <label>Nombre <input id="customerNameInput" /></label>
+              <label>Empresa <input id="customerCompanyInput" /></label>
+              <label>RUT <input id="customerRutInput" /></label>
+              <label>Email <input id="customerEmailInput" /></label>
+              <label>Teléfono <input id="customerPhoneInput" /></label>
+              <label>Tel. secundario <input id="customerSecondaryPhoneInput" /></label>
+              <label>Dirección <input id="customerAddressInput" /></label>
+              <label>Ciudad <input id="customerCityInput" /></label>
+              <label>Región <input id="customerRegionInput" /></label>
+              <label class="full">Notas <textarea id="customerNotesInput"></textarea></label>
+            </form>
+            <div class="project-actions">
+              <button class="primary-action" id="newCustomerBtn">Nuevo</button>
+              <button class="primary-action" id="saveCustomerBtn">Guardar</button>
+            </div>
+          </article>
+          <article class="panel">
+            <h2>Historial del cliente</h2>
+            <div id="customerProjectHistory" class="list"></div>
+          </article>
+        </div>
+      </section>
+
+      <section class="view" id="measurements">
+        <div class="content-grid">
+          <article class="panel">
+            <h2>Medidas iniciales</h2>
+            <form class="form-grid" id="measureForm">
+              <label>Ancho <input id="widthInput" type="number" min="300" value="1800" /></label>
+              <label>Alto <input id="heightInput" type="number" min="300" value="1400" /></label>
+              <label>Unidad
+                <select id="unitInput">
+                  <option>mm</option>
+                  <option>cm</option>
+                  <option>m</option>
+                  <option>pulgadas</option>
+                </select>
+              </label>
+              <label>Sistema
+                <select id="systemInput">
+                  <option value="al25">Aluminio Serie AL-25</option>
+                  <option value="pvc70">PVC Línea 70</option>
+                  <option value="muro">Fachada Muro Cortina</option>
+                </select>
+              </label>
+              <label>Vidrio
+                <select id="glassInput">
+                  <option value="monolitico">Monolítico 6 mm</option>
+                  <option value="termopanel">Termopanel 20 mm</option>
+                  <option value="laminado">Laminado seguridad 8 mm</option>
+                </select>
+              </label>
+              <label>Margen %
+                <input id="marginInput" type="number" min="0" value="28" />
+              </label>
+              <label class="full">Observaciones
+                <textarea id="notesInput">Ventana corredera para living, color negro mate, instalación incluida.</textarea>
+              </label>
+            </form>
+          </article>
+          <article class="panel">
+            <h2>Validaciones automáticas</h2>
+            <div class="validation-box" id="validationBox"></div>
+          </article>
+        </div>
+      </section>
+
+      <section class="view" id="cad">
+        <div class="cad-layout">
+          <article class="tool-panel">
+            <h2>Herramientas</h2>
+            <div class="tool-grid">
+              <button class="tool active">Seleccionar</button>
+              <button class="tool">Mover</button>
+              <button class="tool">Medir</button>
+              <button class="tool">Acotar</button>
+              <button class="tool" id="addVertical">División V</button>
+              <button class="tool" id="addHorizontal">División H</button>
+              <button class="tool" id="removeVertical">Quitar V</button>
+              <button class="tool" id="removeHorizontal">Quitar H</button>
+              <button class="tool">Plantilla</button>
+            </div>
+
+            <h3>Panel seleccionado</h3>
+            <div id="selectedPanelInfo" class="panel-info"></div>
+            <label>Apertura
+              <select id="openingInput" data-panel-field="openingType">
+                <option value="fijo">Fijo</option>
+                <option value="corredera">Corredera</option>
+                <option value="batiente">Batiente</option>
+                <option value="proyectante">Proyectante</option>
+                <option value="oscilobatiente">Oscilobatiente</option>
+                <option value="puerta">Puerta</option>
+              </select>
+            </label>
+            <label>Vidrio
+              <select id="panelGlassInput" data-panel-field="glassType">
+                <option value="transparente">Transparente</option>
+                <option value="satinado">Satinado</option>
+                <option value="bronce">Bronce</option>
+                <option value="azul">Azul</option>
+                <option value="reflectivo">Reflectivo</option>
+                <option value="termopanel">Termopanel</option>
+              </select>
+            </label>
+            <label>Espesor
+              <select id="panelThicknessInput" data-panel-field="glassThickness">
+                <option value="4">4 mm</option>
+                <option value="5">5 mm</option>
+                <option value="6">6 mm</option>
+                <option value="8">8 mm</option>
+                <option value="10">10 mm</option>
+                <option value="12">12 mm</option>
+              </select>
+            </label>
+            <label>Color
+              <select id="colorInput" data-panel-field="frameColor">
+                <option value="blanco">Blanco</option>
+                <option value="negro">Negro</option>
+                <option value="gris">Gris</option>
+                <option value="bronce">Bronce</option>
+                <option value="madera">Madera</option>
+              </select>
+            </label>
+            <label>Perfil
+              <select id="panelProfileInput" data-panel-field="profileSystem">
+                <option value="aluminio_liviano">Aluminio liviano</option>
+                <option value="aluminio_premium">Aluminio premium</option>
+                <option value="pvc_estandar">PVC estándar</option>
+                <option value="pvc_premium">PVC premium</option>
+              </select>
+            </label>
+            <label>Notas panel
+              <textarea id="panelNotesInput" data-panel-field="notes"></textarea>
+            </label>
+            <h3>Divisiones</h3>
+            <div id="cadWarning" class="cad-warning"></div>
+            <div id="divisionList" class="division-list"></div>
+          </article>
+
+          <article class="cad-board panel">
+            <div class="cad-toolbar">
+              <button class="tool" id="cadZoomOut">Zoom -</button>
+              <button class="tool" id="cadZoomIn">Zoom +</button>
+              <button class="tool" id="cadResetView">Reset vista</button>
+              <button class="tool" id="cadFitView">Ajustar</button>
+              <button class="tool" id="cadPanMode">Mano / Pan</button>
+              <button class="tool" id="cadUndo">Undo</button>
+              <button class="tool" id="cadRedo">Redo</button>
+              <span class="cad-status" id="cadStatus">Zoom 100% · Selección · Guardado</span>
+            </div>
+            <div class="cad-rulers">
+              <span id="rulerWidth">1800 mm</span>
+              <span id="rulerHeight">1400 mm</span>
+            </div>
+            <svg id="cadSvg" viewBox="0 0 900 560" role="img" aria-label="Editor CAD paramétrico"></svg>
+          </article>
+
+          <article class="panel calc-panel">
+            <h2>Motor paramétrico</h2>
+            <div id="liveMetrics" class="metric-list"></div>
+          </article>
+        </div>
+      </section>
+
+      <section class="view" id="quote">
+        <article class="panel quote-workspace">
+          <div class="panel-head quote-actions">
+            <div>
+              <h2>Cotización profesional</h2>
+              <p>Documento comercial listo para imprimir o exportar como PDF.</p>
+            </div>
+          <div class="quote-buttons">
+              <button class="primary-action" id="generateProductionOrderBtn">Generar orden de fabricación</button>
+              <button class="primary-action" id="printQuoteBtn">Imprimir cotización</button>
+              <button class="primary-action" id="fakePdfBtn">Exportar PDF</button>
+            </div>
+          </div>
+
+          <div class="quote-controls no-print">
+            <label>Estado
+              <select id="quoteStatusInput">
+                <option value="borrador">Borrador</option>
+                <option value="enviada">Enviada</option>
+                <option value="aprobada">Aprobada</option>
+                <option value="rechazada">Rechazada</option>
+                <option value="vencida">Vencida</option>
+              </select>
+            </label>
+            <label>Descuento CLP <input id="quoteDiscountInput" type="number" min="0" /></label>
+            <label>Validez días <input id="quoteValidityInput" type="number" min="1" /></label>
+            <label>Plazo entrega <input id="quoteDeliveryInput" /></label>
+            <label>Condiciones pago <input id="quotePaymentInput" /></label>
+            <label class="full">Observaciones <textarea id="quoteNotesInput"></textarea></label>
+          </div>
+
+          <div class="quote-document" id="quoteDocument">
+            <div id="quoteSummary"></div>
+            <tbody id="bomTable"></tbody>
+            <tbody id="cutTable"></tbody>
+          </div>
+        </article>
+      </section>
+
+      <section class="view" id="erp">
+        <div class="content-grid">
+          <article class="panel wide">
+            <div class="panel-head">
+              <div>
+                <h2>Órdenes de fabricación</h2>
+                <p>Seguimiento básico de corte, armado, despacho e instalación.</p>
+              </div>
+              <div class="quote-buttons">
+                <input class="search" id="productionSearch" placeholder="Buscar orden, cliente o proyecto" />
+                <select id="productionStatusFilter" class="search">
+                  <option value="todos">Todos</option>
+                  <option value="pendiente">Pendiente</option>
+                  <option value="en_fabricacion">En fabricación</option>
+                  <option value="corte">Corte</option>
+                  <option value="armado">Armado</option>
+                  <option value="vidriado">Vidriado</option>
+                  <option value="control_calidad">Control calidad</option>
+                  <option value="despacho">Despacho</option>
+                  <option value="instalacion">Instalación</option>
+                  <option value="terminado">Terminado</option>
+                  <option value="pausado">Pausado</option>
+                  <option value="cancelado">Cancelado</option>
+                </select>
+              </div>
+            </div>
+            <div class="list" id="productionList"></div>
+          </article>
+          <article class="panel">
+            <h2>Detalle de orden</h2>
+            <div id="productionDetail" class="metric-list"></div>
+            <button class="primary-action" id="reserveMaterialsBtn">Reservar materiales</button>
+            <button class="primary-action" id="scheduleInstallationBtn">Programar instalacion</button>
+            <div id="inventoryReservationWarnings" class="cad-warning"></div>
+          </article>
+          <article class="panel wide">
+            <div class="panel-head">
+              <div>
+                <h2>Agenda / Instalaciones</h2>
+                <p>Programacion, responsables, checklist y cierre de proyecto.</p>
+              </div>
+              <div class="quote-buttons">
+                <input class="search" id="installationSearch" placeholder="Buscar instalacion, cliente o proyecto" />
+                <input class="search" id="installationDateFilter" type="date" />
+                <select id="installationStatusFilter" class="search">
+                  <option value="todos">Todos</option>
+                  <option value="pendiente">Pendiente</option>
+                  <option value="programada">Programada</option>
+                  <option value="en_ruta">En ruta</option>
+                  <option value="en_instalacion">En instalacion</option>
+                  <option value="observada">Observada</option>
+                  <option value="completada">Completada</option>
+                  <option value="reprogramada">Reprogramada</option>
+                  <option value="cancelada">Cancelada</option>
+                </select>
+              </div>
+            </div>
+            <div class="content-grid embedded-grid">
+              <div class="list" id="installationList"></div>
+              <div>
+                <h3>Detalle instalacion</h3>
+                <div id="installationDetail" class="metric-list"></div>
+                <h3>Checklist</h3>
+                <div id="installationChecklist" class="installation-checklist"></div>
+                <button class="primary-action" id="closeProjectFromInstallationBtn">Marcar proyecto terminado</button>
+              </div>
+            </div>
+          </article>
+          <article class="panel wide">
+            <h2>Lista de corte operativa</h2>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>Código</th><th>Descripción</th><th>Color</th><th>Largo</th><th>Cant.</th><th>Ángulos</th><th>Ubicación</th></tr></thead>
+                <tbody id="productionCutTable"></tbody>
+              </table>
+            </div>
+          </article>
+          <article class="panel">
+            <h2>Materiales requeridos</h2>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>Material</th><th>Cantidad</th><th>Total</th></tr></thead>
+                <tbody id="productionMaterialsTable"></tbody>
+              </table>
+            </div>
+          </article>
+          <article class="panel wide">
+            <div class="panel-head">
+              <div>
+                <h2>Inventario</h2>
+                <p>Materiales disponibles, stock mínimo y movimientos.</p>
+              </div>
+              <div class="quote-buttons">
+                <input class="search" id="inventorySearch" placeholder="Buscar código, material o proveedor" />
+                <select id="inventoryCategoryFilter" class="search">
+                  <option value="todos">Todos</option>
+                  <option value="perfil">Perfil</option>
+                  <option value="vidrio">Vidrio</option>
+                  <option value="herraje">Herraje</option>
+                  <option value="accesorio">Accesorio</option>
+                  <option value="consumible">Consumible</option>
+                </select>
+              </div>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>Código</th><th>Nombre</th><th>Categoría</th><th>Unidad</th><th>Stock</th><th>Mín.</th><th>Estado</th><th>Acciones</th></tr></thead>
+                <tbody id="inventoryTable"></tbody>
+              </table>
+            </div>
+          </article>
+          <article class="panel">
+            <h2>Ficha inventario</h2>
+            <form class="form-grid customer-form" id="inventoryForm">
+              <input type="hidden" id="inventoryIdInput" />
+              <label>Código <input id="inventoryCodeInput" /></label>
+              <label>Nombre <input id="inventoryNameInput" /></label>
+              <label>Categoría
+                <select id="inventoryCategoryInput">
+                  <option value="perfil">Perfil</option>
+                  <option value="vidrio">Vidrio</option>
+                  <option value="herraje">Herraje</option>
+                  <option value="accesorio">Accesorio</option>
+                  <option value="consumible">Consumible</option>
+                </select>
+              </label>
+              <label>Unidad
+                <select id="inventoryUnitInput">
+                  <option value="barra">Barra</option>
+                  <option value="m2">m2</option>
+                  <option value="unidad">Unidad</option>
+                  <option value="metro">Metro</option>
+                  <option value="kg">Kg</option>
+                </select>
+              </label>
+              <label>Stock <input id="inventoryStockInput" type="number" /></label>
+              <label>Mínimo <input id="inventoryMinStockInput" type="number" /></label>
+              <label>Costo <input id="inventoryCostInput" type="number" /></label>
+              <label>Proveedor <input id="inventorySupplierInput" /></label>
+              <label>Color <input id="inventoryColorInput" /></label>
+              <label class="full">Notas <textarea id="inventoryNotesInput"></textarea></label>
+            </form>
+            <div class="project-actions">
+              <button class="primary-action" id="newInventoryItemBtn">Nuevo</button>
+              <button class="primary-action" id="saveInventoryItemBtn">Guardar</button>
+            </div>
+          </article>
+          <article class="panel">
+            <h2>Movimientos</h2>
+            <div class="project-actions">
+              <input id="inventoryMoveQtyInput" type="number" placeholder="Cantidad" />
+              <button class="tool" id="inventoryEntryBtn">Entrada</button>
+              <button class="tool" id="inventoryExitBtn">Salida</button>
+            </div>
+            <div id="inventoryMovements" class="list"></div>
+          </article>
+        </div>
+      </section>
+
+      <section class="view" id="ai">
+        <div class="content-grid">
+          <article class="panel wide">
+            <h2>Asistente IA técnico</h2>
+            <div class="assistant-box">
+              <div class="assistant-avatar">AI</div>
+              <div>
+                <strong>Recomendación automática</strong>
+                <p id="aiRecommendation">Para este vano se recomienda termopanel 20 mm y refuerzo central si el ancho supera 2000 mm.</p>
+              </div>
+            </div>
+            <div class="ai-actions">
+              <button class="tool">Reconocer foto</button>
+              <button class="tool">Optimizar cortes</button>
+              <button class="tool">Sugerir vidrio</button>
+              <button class="tool">Detectar riesgos</button>
+            </div>
+          </article>
+          <article class="panel">
+            <h2>Vista 3D conceptual</h2>
+            <div class="mock-3d">
+              <div class="frame-3d"></div>
+            </div>
+          </article>
+          <article class="panel">
+            <h2>Roadmap</h2>
+            <div class="roadmap" id="roadmap"></div>
+          </article>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="./utils/constants.js"></script>
+  <script src="./utils/formatters.js"></script>
+  <script src="./data/technicalData.js"></script>
+  <script src="./data/catalog.js"></script>
+  <script src="./data/demoData.js"></script>
+  <script src="./data/companyData.js"></script>
+  <script src="./storage/localStorageService.js"></script>
+  <script src="./storage/customerStorageService.js"></script>
+  <script src="./storage/productionStorageService.js"></script>
+  <script src="./storage/inventoryStorageService.js"></script>
+  <script src="./storage/installationStorageService.js"></script>
+  <script src="./state/store.js"></script>
+  <script src="./state/actions.js"></script>
+  <script src="./core/calculator.js"></script>
+  <script src="./core/validators.js"></script>
+  <script src="./core/cutList.js"></script>
+  <script src="./core/quoteBuilder.js"></script>
+  <script src="./ui/dashboardView.js"></script>
+  <script src="./ui/catalogView.js"></script>
+  <script src="./ui/customersView.js"></script>
+  <script src="./ui/measuresView.js"></script>
+  <script src="./ui/cadView.js"></script>
+  <script src="./ui/quoteView.js"></script>
+  <script src="./ui/erpView.js"></script>
+  <script src="./ui/aiView.js"></script>
+  <script src="./app.js"></script>
+</body>
+</html>

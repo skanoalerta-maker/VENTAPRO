@@ -1,0 +1,121 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // =====================
+    // HELPERS
+    // =====================
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // 🔐 ADMIN REAL (SIN DEPENDENCIAS CIRCULARES)
+    function isAdmin() {
+      return request.auth != null
+        && exists(/databases/$(database)/documents/admins/$(request.auth.uid))
+        && get(/databases/$(database)/documents/admins/$(request.auth.uid))
+            .data.active == true
+        && get(/databases/$(database)/documents/admins/$(request.auth.uid))
+            .data.role in ['admin', 'superadmin'];
+    }
+
+    // =====================
+    // USERS
+    // =====================
+    match /users/{userId} {
+
+      // Leer: dueño o admin
+      allow read: if isAuthenticated()
+        && (request.auth.uid == userId || isAdmin());
+
+      // Crear: usuario autenticado
+      allow create: if isAuthenticated();
+
+      // Update: SOLO dueño, sin escalar privilegios
+      allow update: if isAuthenticated()
+        && request.auth.uid == userId
+        && !request.resource.data.diff(resource.data).changedKeys()
+            .hasAny(['role', 'founder', 'membership_exempt']);
+
+      // Nunca borrar
+      allow delete: if false;
+    }
+
+    // =====================
+    // ADMINS (FUENTE ÚNICA)
+    // =====================
+    match /admins/{adminId} {
+
+      // ✅ SOLO el propio admin puede leerse
+      allow read: if request.auth != null
+        && request.auth.uid == adminId
+        && resource.data.active == true;
+
+      // ❌ Nadie escribe desde cliente
+      allow create, update, delete: if false;
+    }
+
+    // =====================
+    // VEHICLES
+    // =====================
+    match /vehicles/{vehicleId} {
+
+      allow read: if isAuthenticated()
+        && (
+          resource.data.owner_uid == request.auth.uid
+          || isAdmin()
+        );
+
+      allow create: if isAuthenticated()
+        && (
+          (
+            request.resource.data.membership_required == true &&
+            request.resource.data.membership_active == true &&
+            request.resource.data.membership_exempt != true
+          )
+          ||
+          (
+            request.resource.data.membership_exempt == true &&
+            get(/databases/$(database)/documents/users/$(request.auth.uid))
+              .data.founder == true
+          )
+        );
+
+      allow update: if isAdmin();
+      allow delete: if false;
+    }
+
+    // =====================
+    // STOLEN VEHICLES
+    // =====================
+    match /stolen_vehicles/{stolenId} {
+      allow read: if isAuthenticated();
+      allow create, update: if isAdmin();
+      allow delete: if false;
+    }
+
+    // =====================
+    // REPORTS
+    // =====================
+    match /reports/{reportId} {
+
+      allow read: if isAuthenticated();
+
+      allow create: if isAuthenticated()
+        && request.resource.data.uid == request.auth.uid
+        && get(/databases/$(database)/documents/users/$(request.auth.uid))
+            .data.verification_status == "approved";
+
+      allow update, delete: if false;
+    }
+
+    // =====================
+    // ADMIN LOGS
+    // =====================
+    match /admin_logs/{logId} {
+      allow read, create: if isAdmin();
+      allow update, delete: if false;
+    }
+  }
+}
+

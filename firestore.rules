@@ -1,0 +1,228 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // =====================
+    // HELPERS
+    // =====================
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return request.auth != null
+        && exists(/databases/$(database)/documents/admins/$(request.auth.uid))
+        && get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.active == true
+        && get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.role in ['admin', 'superadmin'];
+    }
+
+    // =====================
+    // USERS
+    // =====================
+    match /users/{userId} {
+
+      allow read: if isAuthenticated()
+        && (request.auth.uid == userId || isAdmin());
+
+      allow create: if isAuthenticated()
+        && request.auth.uid == userId;
+
+      allow update: if isAdmin()
+        || (
+          isAuthenticated()
+          && request.auth.uid == userId
+
+          && !request.resource.data.diff(resource.data).changedKeys()
+            .hasAny([
+              'role',
+              'founder',
+              'membership_exempt',
+
+              'blocked',
+              'blocked_reason',
+              'blocked_until',
+              'blocked_by_admin',
+
+              'approved_at',
+              'approved_by',
+              'rejected_at',
+              'rejected_by',
+
+              'adminComment',
+
+              'approval_email_pending',
+              'approval_email_sent',
+              'approval_email_error',
+
+              'rejection_email_pending',
+              'rejection_email_sent',
+              'rejection_email_error'
+            ])
+
+          && (
+            !request.resource.data.diff(resource.data)
+              .changedKeys()
+              .hasAny(['verification_status'])
+
+            || request.resource.data.verification_status
+              in ['draft', 'pending', 'reverification_pending']
+          )
+
+          && (
+            !request.resource.data.diff(resource.data)
+              .changedKeys()
+              .hasAny(['documentStatus'])
+
+            || request.resource.data.documentStatus
+              in ['draft', 'pending']
+          )
+        );
+
+      // =====================
+      // USER REWARD PENDING
+      // =====================
+      match /reward_pending/{rewardId} {
+
+        allow read, create, update: if isAuthenticated()
+          && request.auth.uid == userId;
+
+        allow delete: if false;
+      }
+
+      allow delete: if false;
+    }
+
+    // =====================
+    // ADMINS
+    // =====================
+    match /admins/{adminId} {
+
+      allow read: if request.auth != null
+        && request.auth.uid == adminId
+        && resource.data.active == true;
+
+      allow create, update, delete: if false;
+    }
+
+    // =====================
+    // RUT INDEX
+    // =====================
+    match /rut_index/{rutId} {
+
+      allow read: if isAuthenticated();
+
+      allow create: if isAuthenticated()
+        && request.resource.data.uid == request.auth.uid;
+
+      allow update, delete: if false;
+    }
+
+    // =====================
+    // APP CONFIG
+    // =====================
+    match /app_config/{docId} {
+
+      allow read: if true;
+
+      allow create, update, delete: if isAdmin();
+    }
+
+    // =====================
+    // VEHICLES
+    // =====================
+    match /vehicles/{vehicleId} {
+
+      allow read: if isAuthenticated()
+        && (
+          resource.data.owner_uid == request.auth.uid
+          || isAdmin()
+        );
+
+      allow create: if isAuthenticated()
+        && (
+          (
+            request.resource.data.membership_required == true
+            && request.resource.data.membership_active == true
+            && request.resource.data.membership_exempt != true
+          )
+          ||
+          (
+            request.resource.data.membership_exempt == true
+            && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.founder == true
+          )
+        );
+
+      allow update: if isAdmin();
+
+      allow delete: if false;
+    }
+
+    // =====================
+    // STOLEN VEHICLES
+    // =====================
+    match /stolen_vehicles/{stolenId} {
+
+      allow read: if isAuthenticated();
+
+      allow create: if isAdmin();
+
+      allow update: if isAdmin()
+        || (
+          isAuthenticated()
+          && resource.data.verified == true
+          && resource.data.status in ['stolen', 'reported']
+          && request.resource.data.diff(resource.data).changedKeys()
+            .hasOnly([
+              'active',
+              'status',
+              'reported_at',
+              'last_report_id',
+              'recovered_at',
+              'recovered_to',
+              'last_not_found_report_id',
+              'last_not_found_at',
+              'updated_at',
+              'last_clone_report_id',
+              'clone_reports_count',
+              'last_clone_finalized_report_id',
+              'clone_finalized_count',
+              'last_known_police_destination'
+            ])
+        );
+
+      allow delete: if false;
+    }
+
+    // =====================
+    // REPORTS
+    // =====================
+    match /reports/{reportId} {
+
+      allow read: if isAuthenticated();
+
+      allow create: if isAuthenticated()
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.reporter_uid == request.auth.uid
+        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.verification_status == "approved";
+
+      allow update: if isAuthenticated()
+        && resource.data.uid == request.auth.uid
+        && resource.data.reporter_uid == request.auth.uid
+        && request.resource.data.uid == resource.data.uid
+        && request.resource.data.reporter_uid == resource.data.reporter_uid;
+
+      allow delete: if false;
+    }
+
+    // =====================
+    // ADMIN LOGS
+    // =====================
+    match /admin_logs/{logId} {
+
+      allow read, create: if isAdmin();
+
+      allow update, delete: if false;
+    }
+  }
+}
